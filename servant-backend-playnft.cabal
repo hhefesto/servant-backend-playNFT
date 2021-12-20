@@ -1,0 +1,56 @@
+name:                servant-backend-playnft
+version:             0.1.0.0
+synopsis:            Backend for playNFT
+description:         Please see README.md
+-- homepage:            https://github.com/Stand-In-Language/stand-in-language#readme
+license:             Apache-2.0
+license-file:        LICENSE
+author:              Daniel Herrera
+maintainer:          daniel.herrera.rendon@gmail.com
+copyright:           2021 Sam Griffin
+-- category:            Language
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+executable servant-backend-playnft
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  build-depends:       base
+                     , text >= 1.2
+                     , mtl >= 2.1
+                     , network >= 2.6
+                     , bytestring >= 0.10
+                     , servant
+                     , servant-server
+                     , servant-multipart
+                     , transformers
+                     , warp >= 3.2
+                     , wai >= 3.2
+                     , markdown-unlit >= 0.4
+                     , http-client >= 0.5
+  default-language:    Haskell2010
+  ghc-options:         -Wall
+  -- ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  -- build-depends:       base
+  -- -- TODO: change this to Haskell2021 if possible and viable
+  -- default-language:    Haskell2010
+
+-- TODO: test suit
+-- test-suite telomare-test
+--   type:                exitcode-stdio-1.0
+--   hs-source-dirs:      test
+--   main-is:             Spec.hs
+--   other-modules:       Common
+--   build-depends:       base
+--                      , hspec
+--                      , hspec-core
+--                      , telomare
+--                      , strict
+--                      , QuickCheck
+--   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+--   default-language:    Haskell2010
+
+-- source-repository head
+--   type:     git
+--   location: https://github.com/Stand-In-Language/stand-in-language
