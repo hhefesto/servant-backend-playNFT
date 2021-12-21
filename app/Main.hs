@@ -2,6 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
+module Main where
+
 import           Control.Concurrent
 import           Control.Exception
 import           Control.Monad
@@ -40,20 +42,27 @@ upload multipartData = do
       LBS.putStr content
   return 0
 
-startServer :: IO ()
-startServer = run 8080 (serve api upload)
-
 main :: IO ()
-main = withSocketsDo . bracket (forkIO startServer) killThread $ \_threadid -> do
-  -- we fork the server in a separate thread and send a test
-  -- request to it from the main thread.
+main = do
+  putStrLn "Servant server running..."
+  run 8080 (serve api upload)
+
+-- main :: IO ()
+-- main = run 8080 (serve api upload)
+
+-- main :: IO ()
+-- main = withSocketsDo . bracket (forkIO startServer) killThread $ \_threadid -> do
+--   -- we fork the server in a separate thread and send a test
+--   -- request to it from the main thread.
+test :: IO ()
+test = do
   manager <- newManager defaultManagerSettings
   req <- parseRequest "http://localhost:8080/"
   resp <- flip httpLbs manager =<< formDataBody form req
   print resp
 
-  where form =
-          [ partBS "title" "World"
-          , partBS "text" $ encodeUtf8 "Hello"
-          , partFileSource "file" "./README.md"
-          ]
+  where form = [ partBS "title" "World"
+               , partBS "text" $ encodeUtf8 "Hello"
+               , partFileSource "file" "./README.md"
+               -- , partFileSource "file" "./chamales.jpeg"
+               ]

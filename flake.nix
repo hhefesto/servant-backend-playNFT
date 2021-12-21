@@ -39,7 +39,7 @@
         })
       ];
       pkgs = import nixpkgs { inherit system overlays; };
-      flake = builtins.trace (pkgs.servant-backend-playnft.flake {}).apps (pkgs.servant-backend-playnft.flake {});
+      flake = pkgs.servant-backend-playnft.flake {};
     in flake // {
       # Built by `nix build .`
       defaultPackage = flake.packages."servant-backend-playnft:exe:servant-backend-playnft";
