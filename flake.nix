@@ -19,22 +19,27 @@
             # If these null parameters are absent, you get a RestrictedPathError error
             # from trying to do readIfExists on cabal.project file
             cabalProjectFreeze = null;
-            cabalProject = null;
+            # cabalProject = null;
             cabalProjectLocal = null;
 
             src = final.haskell-nix.cleanSourceHaskell {
               src = ./.;
               name = "servant-backend-playnft";
             };
-            # compiler-nix-name = "ghc884";
-            compiler-nix-name = "ghc8107";
+            compiler-nix-name = "ghc884";
+            # compiler-nix-name = "ghc8107";
             # compiler-nix-name = "ghc921";
             # This is used by `nix develop .` to open a shell for use with
             # `cabal`, `hlint` and `haskell-language-server`
             shell.tools = {
+              ghcid = {};
               cabal = {};
               haskell-language-server = {};
             };
+            # Non-Haskell shell tools go here
+            shell.buildInputs = with pkgs; [
+              nodejs
+            ];
           };
         })
       ];

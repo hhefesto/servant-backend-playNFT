@@ -1,0 +1,15 @@
+packages: ./*.cabal
+
+source-repository-package
+    type: git
+    location: git@github.com:tweag/inline-js.git
+    tag: 8512b09d2c0533a41d5d2aef182b11a58c420c10
+    subdir: inline-js
+    --sha256: 0l4m99jzmadv8dxcb932l3ddcx3qr1fr98q96dpblb2anbqal20y
+
+source-repository-package
+    type: git
+    location: git@github.com:tweag/inline-js.git
+    tag: 8512b09d2c0533a41d5d2aef182b11a58c420c10
+    subdir: inline-js-core
+    --sha256: 0l4m99jzmadv8dxcb932l3ddcx3qr1fr98q96dpblb2anbqal20y
