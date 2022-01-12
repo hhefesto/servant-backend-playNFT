@@ -13,6 +13,9 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
+data-files: js/web3.min.js
+          , js/web3.js
+
 executable servant-backend-playnft
   hs-source-dirs:      app
   main-is:             Main.hs

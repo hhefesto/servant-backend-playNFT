@@ -1,10 +1,11 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeApplications  #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE QuasiQuotes         #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module Main where
 
@@ -18,6 +19,7 @@ import qualified Data.ByteString.Lazy                  as LBS
 import           Data.Foldable
 import           Data.Map.Lazy                         as Map
 import           Data.Solidity.Prim.Address            (Address, fromPubKey)
+import           Data.String
 import           Data.Text                             as Text
 import           Data.Text.Encoding                    (encodeUtf8)
 import           GHC.Generics
@@ -30,6 +32,7 @@ import           Network.Wai.Handler.Warp
 import           Servant
 import           Servant.Multipart
 import           System.Directory
+import           System.IO
 import           System.IO.Temp
 import           System.Process
 
@@ -86,33 +89,16 @@ test = do
                -- , partFileSource "file" "./chamales.jpeg"
                ]
 
-
-
--- data DNSRecord = DNSRecord
---   { address :: String
---   , family  :: Int
---   } deriving (FromJSON, Generic, Show)
-
-eval' :: FromJS a => Session -> JSExpr -> IO a
-eval' s e = evaluate =<< eval s e
-
-helloJS :: IO ()
-helloJS = withSession defaultConfig $ \s -> eval' s "console.error('Hello JS world!');"
-  -- session <- newSession defaultConfig
-  -- eval' session "console.error('Hello JS world!');"
-
-    -- [js|
-    --     const dns = (await import("dns")).promises;
-    --     return dns.lookup($hostname, {all: true});
-    -- |]
--- eval :: forall a. FromJS a => Session -> JSExpr -> IO a
--- withSession :: Config -> (Session -> IO r) -> IO r
-
-hello :: IO ()
-hello =
-  withSystemTempDirectory "" $ \tmpdir -> do
-    withCurrentDirectory tmpdir $
-      traverse_
-        callCommand
-        ["npm init --yes", "npm install --save --save-exact webtorrent@0.103.1"]
-    withSession defaultConfig $ \s -> eval' s "console.error('Hello JS world!');"
+hello2 :: IO ()
+hello2 = do
+  sess <- newSession defaultConfig
+  x <- importMJS sess "./js/node_modules/web3/src/index.js"
+  -- x <- importMJS sess "./js/web3.min.js"
+  let rawJS = [js|
+                 var Web3 = $x
+                 web3 = new Web3.default("http://localhost:8545");
+                 console.error(typeof web3.eth.accounts.recover);
+                 |]
+  () <- eval sess rawJS >>= evaluate
+  killSession sess
+  pure ()
