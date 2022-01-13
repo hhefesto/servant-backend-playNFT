@@ -50,21 +50,30 @@ upload :: Server API
 upload multipartData = do
   liftIO $ do
     let myInputs = fromList $ (\i -> (iName i, iValue i)) <$> (inputs multipartData)
-    let Just sd = Map.lookup "signedData" myInputs
-    let Just sig = Map.lookup "signature" myInputs
-    putStrLn . Text.unpack $ "(signedData, signature) = (" <> sd <> ",,,,,,,,,,,,,, " <> sig <> ")"
-    putStrLn $ "Signature size = " <> (show (Text.length sig))
-    putStrLn "Inputs:"
-    putStrLn $ show $ (inputs multipartData)
-    forM_ (inputs multipartData) $ \input ->
-      putStrLn $ "  " ++ show (iName input)
-            ++ " -> " ++ show (iValue input)
+        Just sd' = Map.lookup "signedData" myInputs
+        Just sig' = Map.lookup "signature" myInputs
+        sd :: String
+        sd = show . unpack $ sd'
+        sig :: String
+        sig = "\"" <> unpack sig' <> "\""
+    sess <- newSession defaultConfig
+    x <- importMJS sess "./js/node_modules/web3/src/index.js"
+    a :: JSVal <- eval sess (fromString sd) >>= evaluate
+    b :: JSVal <- eval sess (fromString sig) >>= evaluate
+    let rawJS = [js|
+                   var Web3 = $x
+                   web3 = new Web3.default("http://localhost:8545");
+                   aux = web3.eth.accounts.recover($a,$b);
+                   return aux;
+                   |]
+    res' :: EncodedString <- eval sess rawJS >>= evaluate
 
-    forM_ (files multipartData) $ \file -> do
-      let content = fdPayload file
-      putStrLn $ "Content of " ++ show (fdFileName file)
-      LBS.putStr content
-  return 0
+    let res = unEncodedString res'
+    putStrLn "res:"
+    print res
+    killSession sess
+  pure 0
+
 
 main :: IO ()
 main = do
@@ -88,17 +97,3 @@ test = do
                , partFileSource "file" "./README.md"
                -- , partFileSource "file" "./chamales.jpeg"
                ]
-
-hello2 :: IO ()
-hello2 = do
-  sess <- newSession defaultConfig
-  x <- importMJS sess "./js/node_modules/web3/src/index.js"
-  -- x <- importMJS sess "./js/web3.min.js"
-  let rawJS = [js|
-                 var Web3 = $x
-                 web3 = new Web3.default("http://localhost:8545");
-                 console.error(typeof web3.eth.accounts.recover);
-                 |]
-  () <- eval sess rawJS >>= evaluate
-  killSession sess
-  pure ()
